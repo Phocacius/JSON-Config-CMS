@@ -30,6 +30,7 @@ The following constants are optional:
 
 - `BACKEND_URL`: when using the `ExternalAuthenticator`, define the url to your backend in your config.
 - `STORAGE_CLASS_NAME`: When extending the default `Storage` class, e.g. for custom placeholders, create a constant with the class name of your Storage class.
+- `TMP_DIR`: directory for temporary files. Default: `DOCUMENT_ROOT/tmp`
 
 ### `setup.php`
 

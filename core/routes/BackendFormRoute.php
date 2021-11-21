@@ -27,8 +27,8 @@ abstract class BackendFormRoute extends BackendRoute {
 
     public function matches($route): bool {
         return in_array($route, [
-            "/" . BACKEND_PREFIX . "/" . $this->slug,
-            "/" . BACKEND_PREFIX . "/" . $this->slug . "/"
+            BACKEND_PREFIX . "/" . $this->slug,
+            BACKEND_PREFIX . "/" . $this->slug . "/"
         ]);
     }
 

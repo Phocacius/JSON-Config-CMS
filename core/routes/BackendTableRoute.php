@@ -103,24 +103,24 @@ abstract class BackendTableRoute extends BackendRoute {
 
     private function matchesForm($route): bool {
         return in_array($route, [
-            "/" . BACKEND_PREFIX . "/" . $this->slug,
-            "/" . BACKEND_PREFIX . "/" . $this->slug . "/"]);
+            BACKEND_PREFIX . "/" . $this->slug,
+            BACKEND_PREFIX . "/" . $this->slug . "/"]);
     }
 
     private function matchesEdit($route): bool {
-        $doesMatch = preg_match("|/" . BACKEND_PREFIX . "/" . $this->slug . "/([^/]+)/edit|", $route, $matches);
+        $doesMatch = preg_match("|" . BACKEND_PREFIX . "/" . $this->slug . "/([^/]+)/edit|", $route, $matches);
         if ($doesMatch) {
             $this->id = $matches[1];
             return true;
         }
         return in_array($route, [
-            "/" . BACKEND_PREFIX . "/" . $this->slug . "/create",
-            "/" . BACKEND_PREFIX . "/" . $this->slug . "create/"
+            BACKEND_PREFIX . "/" . $this->slug . "/create",
+            BACKEND_PREFIX . "/" . $this->slug . "create/"
         ]);
     }
 
     private function matchesView($route): bool {
-        $doesMatch = preg_match("|/" . BACKEND_PREFIX . "/" .$this->slug . "/([^/]+)/view/([^/]+)|", $route, $matches);
+        $doesMatch = preg_match("|" . BACKEND_PREFIX . "/" .$this->slug . "/([^/]+)/view/([^/]+)|", $route, $matches);
         if ($doesMatch) {
             $this->id = $matches[1];
             $this->fieldToBeViewed = $matches[2];
@@ -131,8 +131,8 @@ abstract class BackendTableRoute extends BackendRoute {
 
     function matchesAjax($route): bool {
         return in_array($route, [
-            "/" . BACKEND_PREFIX . "/" . $this->slug . "/ajax",
-            "/" . BACKEND_PREFIX . "/" . $this->slug . "ajax/"
+            BACKEND_PREFIX . "/" . $this->slug . "/ajax",
+            BACKEND_PREFIX . "/" . $this->slug . "ajax/"
         ]);
     }
 
@@ -205,7 +205,7 @@ abstract class BackendTableRoute extends BackendRoute {
             "isPaginated" => $isPaginated,
             "paginationInfo" => $paginationInfo,
             "sortable" => $canBeSorted,
-            "adminurl" => BASEURL . "/" . BACKEND_PREFIX
+            "adminurl" => BASEURL . BACKEND_PREFIX
         ));
     }
 
@@ -383,7 +383,7 @@ abstract class BackendTableRoute extends BackendRoute {
             return;
         }
 
-        $tmpDir = defined("TMP_DIR") ? TMP_DIR : __DIR__ . "/../../tmp/" . uniqid();
+        $tmpDir = defined("TMP_DIR") ? TMP_DIR : DOCUMENT_ROOT . "tmp/" . uniqid();
         mkdir($tmpDir, 0777, true);
 
         $tmpFile = $_FILES['zipfile']['tmp_name'];
