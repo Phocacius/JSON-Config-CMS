@@ -73,6 +73,10 @@ class Storage {
     }
 
     public function replacePlaceholders($value) {
-        return str_replace("%BASEURL%", BASEURL, $value);
+        return str_replace(
+            ["%BASEURL%", "%YEAR%"], 
+            [BASEURL, date("Y")], 
+            $value
+        );
     }
 }
