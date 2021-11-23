@@ -12,6 +12,10 @@
  *   the image's aspect ratio
  * - x[height] (e.g. x500): scales the image to a height of [width] pixels. The width is adjusted to maintain
  *   the image's aspect ratio
+ * - sw[smallest-width]: scaled the image to a height or width of [smallest-width] pixels, whatever is smaller.
+ *   The other dimension is adjusted to be at least as big as the [smallest-width], maintaining aspect ratio
+ * - lw[largest-width]: scaled the image to a height or width of [largest-width] pixels, whatever is larger.
+ *   The other dimension is adjusted to be at most as big as the [largest-width], maintaining aspect ratio
  * - [width]x[height] (e.g. 500x700): scales the image to a fixed pixel size. If the aspect ratio does not fit,
  *   the image will be center cropped to fit the given aspect ratio
  */
@@ -33,12 +37,11 @@ class ImageScaler {
      * @throws ImagickException
      */
     public function scale(string $scaleString, string $target) {
+        echo $scaleString." / ".$target."<br>";
         if (class_exists("Imagick")) {
             $im = new Imagick(realpath($this->path));
 
-            if (strpos($scaleString, "x") === false) {
-                $im->scaleImage($scaleString, $scaleString, true);
-            } else {
+            if (strpos($scaleString, "x") !== false) {
                 $split = explode("x", $scaleString);
                 $w = is_numeric($split[0]) ? $split[0] : 0;
                 $h = is_numeric($split[1]) ? $split[1] : 0;
@@ -47,6 +50,22 @@ class ImageScaler {
                 } else {
                     $im->scaleImage($w, $h);
                 }
+            } elseif (strpos($scaleString, "sw") !== false) {
+                $sw = (int) (substr($scaleString, 2));
+                if ($im->getImageWidth() > $im->getImageHeight()) {
+                    $im->scaleImage(0, $sw);
+                } else {
+                    $im->scaleImage($sw, 0);
+                }
+            } elseif (strpos($scaleString, "lw") !== false) {
+                $lw = (int) (substr($scaleString, 2));
+                if ($im->getImageWidth() > $im->getImageHeight()) {
+                    $im->scaleImage($lw, 0);
+                } else {
+                    $im->scaleImage(0, $lw);
+                }
+            } else {
+                $im->scaleImage($scaleString, $scaleString, true);
             }
             $dirname = dirname($target);
             if (!is_dir($dirname)) mkdir($dirname, 0777, true);
@@ -62,18 +81,7 @@ class ImageScaler {
             $srcHeight = imagesy($im);
             $srcCoords = [0, 0, $srcWidth, $srcHeight];
 
-            if (strpos($scaleString, "x") === false) {
-                $targetSize = (int)$scaleString;
-                if ($targetSize < 1) throw new Exception("Ungültiger scaleString $scaleString");
-
-                if ($srcWidth > $srcHeight) {
-                    $targetWidth = $targetSize;
-                    $targetHeight = (int)($targetWidth / ($srcWidth / (double)$srcHeight));
-                } else {
-                    $targetHeight = $targetSize;
-                    $targetWidth = (int)($targetHeight / ($srcHeight / (double)$srcWidth));
-                }
-            } else {
+            if (strpos($scaleString, "x") !== false) {
                 $split = explode("x", $scaleString);
                 $targetWidth = is_numeric($split[0]) ? $split[0] : 0;
                 $targetHeight = is_numeric($split[1]) ? $split[1] : 0;
@@ -97,6 +105,35 @@ class ImageScaler {
                 } else {
                     throw new Exception("Ungültiger scaleString $scaleString");
                 }
+            } elseif (strpos($scaleString, "sw") !== false) {
+                $sw = (int) (substr($scaleString, 2));
+                if ($srcWidth > $srcHeight) {
+                    $targetHeight = $sw;
+                    $targetWidth = (int)($targetHeight / ($srcHeight / (double)$srcWidth));
+                } else {
+                    $targetWidth = $sw;
+                    $targetHeight = (int)($targetWidth / ($srcWidth / (double)$srcHeight));
+                }
+            } elseif (strpos($scaleString, "lw") !== false) {
+                $lw = (int) (substr($scaleString, 2));
+                if ($srcWidth > $srcHeight) {
+                    $targetWidth = $lw;
+                    $targetHeight = (int)($targetWidth / ($srcWidth / (double)$srcHeight));
+                } else {
+                    $targetHeight = $lw;
+                    $targetWidth = (int)($targetHeight / ($srcHeight / (double)$srcWidth));
+                }
+            } else {
+                $targetSize = (int)$scaleString;
+                if ($targetSize < 1) throw new Exception("Ungültiger scaleString $scaleString");
+
+                if ($srcWidth > $srcHeight) {
+                    $targetWidth = $targetSize;
+                    $targetHeight = (int)($targetWidth / ($srcWidth / (double)$srcHeight));
+                } else {
+                    $targetHeight = $targetSize;
+                    $targetWidth = (int)($targetHeight / ($srcHeight / (double)$srcWidth));
+                }                
             }
 
             $srcType = exif_imagetype(realpath($this->path));

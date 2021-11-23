@@ -18,6 +18,10 @@
  *   the image's aspect ratio
  * - x[height] (e.g. x500): scales the image to a height of [width] pixels. The width is adjusted to maintain
  *   the image's aspect ratio
+ * - sw[smallest-width]: scaled the image to a height or width of [smallest-width] pixels, whatever is smaller.
+ *   The other dimension is adjusted to be at least as big as the [smallest-width], maintaining aspect ratio
+ * - lw[largest-width]: scaled the image to a height or width of [largest-width] pixels, whatever is larger.
+ *   The other dimension is adjusted to be at most as big as the [largest-width], maintaining aspect ratio
  * - [width]x[height] (e.g. 500x700): scales the image to a fixed pixel size. If the aspect ratio does not fit,
  *   the image will be center cropped to fit the given aspect ratio
  *
