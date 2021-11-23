@@ -250,6 +250,15 @@ abstract class BackendTableRoute extends BackendRoute {
         }
     }
 
+
+    /**
+     * provide default values for newly created entries
+     * @return array value array containing the database table columns as keys
+     */
+    protected function getDefaultValues(): array {
+        return [];
+    }
+
     /**
      * renders an html form to edit an existing or create a new entry of this table
      */
@@ -270,6 +279,8 @@ abstract class BackendTableRoute extends BackendRoute {
                 $this->redirectToForm();
                 return;
             }
+        } else {
+            $values = $this->getDefaultValues();
         }
 
         foreach ($values as $key => $value) {
