@@ -20,6 +20,7 @@ class GeoLocation extends DataType {
     }
 
     function renderBackendTable($value): string {
+
         $val = $value ? json_decode($this->value, true) : null;
         if($val === null) return "-";
 
@@ -30,16 +31,18 @@ class GeoLocation extends DataType {
 
     function renderBackendForm(): string {
         $val = $this->value ? json_decode($this->value, true) : array();
-        $lat = array_key_exists("lat", $val) ? $val['lat'] : $this->config['lat'];
-        $lon = array_key_exists("lon", $val) ? $val['lon'] : $this->config['lon'];
+        $lat = array_key_exists("lat", $val) ? $val['lat'] : (array_key_exists("lat", $this->config) ? $this->config['lat'] : 0);
+        $lon = array_key_exists("lon", $val) ? $val['lon'] : (array_key_exists("lon", $this->config) ? $this->config['lon'] : 0);
         $value = json_encode(["lat" => $lat, "lon" => $lon]);
+        $addressHint = array_key_exists("address-hint", $this->config) ? $this->config['address-hint'] : "";
+        $zoom = array_key_exists("zoom", $this->config) ? $this->config['zoom'] : 13;
 
         return '
 <div class="map-container">
     <input type="hidden" class="map-output-field" id="input-'.$this->name.'" name="'.$this->name.'" value="'.htmlentities($value).'">
     <div>Adresse suchen: 
-    <div class="input-group" style="margin-bottom: 15px;"><input class="form-control map-search-field" data-address-hint="'.$this->config['address-hint'].'" type="text"><div class="input-group-append"><button class="btn btn-outline-primary map-search-button">Suchen</button></div></div></div>
-    <div class="googlemap" data-lat="'.$lat.'" data-lon="'.$lon.'" data-zoom="'.$this->config['zoom'].'" data-marker="1"></div>
+    <div class="input-group" style="margin-bottom: 15px;"><input class="form-control map-search-field" data-address-hint="'.$addressHint.'" type="text"><div class="input-group-append"><button class="btn btn-outline-primary map-search-button">Suchen</button></div></div></div>
+    <div class="googlemap" data-lat="'.$lat.'" data-lon="'.$lon.'" data-zoom="'.$zoom.'" data-marker="1"></div>
 </div>';
     }
 
