@@ -37,7 +37,6 @@ class ImageScaler {
      * @throws ImagickException
      */
     public function scale(string $scaleString, string $target) {
-        echo $scaleString." / ".$target."<br>";
         if (class_exists("Imagick")) {
             $im = new Imagick(realpath($this->path));
 
