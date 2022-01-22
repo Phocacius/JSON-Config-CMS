@@ -8,6 +8,12 @@
  */
 abstract class BackendRoute extends Route {
 
+    /**
+     * contains the complete route, e.g. /admin/users/1/edit
+     * @var string
+     */
+    protected $route;
+
     public function __construct() {
         parent::__construct();
     }

@@ -26,16 +26,31 @@ abstract class BackendFormRoute extends BackendRoute {
     /** MATCHING */
 
     public function matches($route): bool {
+        $this->route = $route;
         return in_array($route, [
             BACKEND_PREFIX . "/" . $this->slug,
             BACKEND_PREFIX . "/" . $this->slug . "/"
+        ]) || $this->matchesAjax($route);
+    }
+
+    function matchesAjax($route): bool {
+        return in_array($route, [
+            BACKEND_PREFIX . "/" . $this->slug . "/ajax",
+            BACKEND_PREFIX . "/" . $this->slug . "ajax/"
         ]);
+    }
+
+    protected function shouldRenderTemplate(): bool {
+        if ($this->matchesAjax($this->route)) {
+            BackendTableAjaxHelper::handleAjaxForm($this);
+            return false;
+        }
+        return parent::shouldRenderTemplate();
     }
 
     /** FORM */
 
     function renderBackend($route) {
-
         if ($_SERVER['REQUEST_METHOD'] == "POST" && array_key_exists("form", $_POST) && $_POST['form'] == $this->jsonFileName) {
             $this->saveData();
         } else {
@@ -44,7 +59,7 @@ abstract class BackendFormRoute extends BackendRoute {
     }
 
     function saveData() {
-        $values = $this->getValueArray($this->jsonFileName);
+        $values = $this->getValueArray($this->jsonFileName, null, Storage::getInstance()->getAll(false));
         $values = $this->processDataBeforeSaving($values);
         Storage::getInstance()->setAll($values);
 
@@ -61,7 +76,8 @@ abstract class BackendFormRoute extends BackendRoute {
         $this->renderTemplate("admin-general-edit.html", array(
             "label" => $label,
             "id" => true,
-            "form" => $this->generateFormHtml($this->jsonFileName, $storage->getAll(false))
+            "form" => $this->generateFormHtml($this->jsonFileName, $storage->getAll(false)),
+            "ajaxtarget" => BACKEND_PREFIX . "/" . $this->slug . "/ajax",
         ));
     }
 }

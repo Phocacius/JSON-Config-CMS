@@ -40,4 +40,24 @@ class BackendTableAjaxHelper {
                 echo '{"message": "Aktion nicht bekannt oder nicht angegeben."}';
         }
     }
+
+    public static function handleAjaxForm(BackendFormRoute $route) {
+        $action = $_POST['action'];
+        switch ($action) {
+            case "set":
+                $field = DB::escape($_POST['field']);
+                $value = DB::escape($_POST['value']);
+                Storage::getInstance()->set($field, $value, true);
+                echo '{"message": "Eintrag aktualisiert"}';
+                break;
+            case "delete":
+                $field = DB::escape($_POST['field']);
+                Storage::getInstance()->set($field, null, true);
+                echo '{"message": "Eintrag gelöscht."}';
+                break;
+            default:
+                http_response_code(400);
+                echo '{"message": "Aktion nicht bekannt oder nicht angegeben."}';
+        }
+    }
 }

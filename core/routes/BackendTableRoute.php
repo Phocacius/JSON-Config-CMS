@@ -30,12 +30,6 @@ abstract class BackendTableRoute extends BackendRoute {
     public $id;
 
     /**
-     * contains the complete route, e.g. /admin/users/1/edit
-     * @var string
-     */
-    protected $route;
-
-    /**
      * SQL that is added to all select queries. Could e.g. be used to set a default order by. Always add a space first.
      * @var string
      */
@@ -293,7 +287,7 @@ abstract class BackendTableRoute extends BackendRoute {
         $label = array_key_exists("label", $data) ? $data['label'] : (array_key_exists("title", $data) ? $data['title'] : "Eintrag");
 
         $this->renderTemplate("admin-general-edit.html", array(
-            "ajaxtarget" => $this->slug . "/ajax",
+            "ajaxtarget" => BACKEND_PREFIX . "/" . $this->slug . "/ajax",
             "label" => $label,
             "id" => $this->id,
             "form" => $form
