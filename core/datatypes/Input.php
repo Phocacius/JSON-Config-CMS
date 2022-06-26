@@ -14,6 +14,10 @@
  * @see WYSIWYG for formatted text input
  */
 class Input extends DataType {
+    public function renderBackendTable($value): string {
+        return $value ? $value : "–";
+    }
+
 
     function renderBackendForm(): string {
         $type = $this->config['type'] ?: "text";
