@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * A base class that can be used for a backend page that represents a single database table
+ * Both viewing the list and editing a single entry are supplied
+ */
 abstract class BackendTableRoute extends BackendRoute {
 
     public function __construct($slug, $tableName) {
@@ -98,6 +102,8 @@ abstract class BackendTableRoute extends BackendRoute {
     private function matchesForm($route): bool {
         return in_array($route, [
             BACKEND_PREFIX . "/" . $this->slug,
+            BACKEND_PREFIX . "/" . $this->slug . "/table",
+            BACKEND_PREFIX . "/" . $this->slug . "/table/",
             BACKEND_PREFIX . "/" . $this->slug . "/"]);
     }
 
@@ -137,6 +143,22 @@ abstract class BackendTableRoute extends BackendRoute {
      * renders a html table displaying all entries in the table
      */
     function renderBackendForm() {
+        $this->renderTemplate("admin-general-form.html", $this->getDataForBackendForm());
+    }
+
+    /**
+     * this method can be overwritten to supply additional where clauses, e.g. when a list is filtered manually
+     * @return array of strings containing SQL comparisons, without the "WHERE"
+     */
+    function getWhereClausesForBackendEntries(): array {
+        return [];
+    }
+
+    /**
+     * collects data for rendering the backend form
+     * @return array twig context variables
+     */
+    function getDataForBackendForm(): array {
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'zipupload') {
             $this->handleZipUpload();
         }
@@ -151,10 +173,12 @@ abstract class BackendTableRoute extends BackendRoute {
         $isPaginated = false;
         $paginationInfo = [];
 
+        $whereClause = DB::getWhereClauses($this->getWhereClausesForBackendEntries());
+
         if ($canBeSorted) {
             // no pagination for sorted fields, before sorting would not work then
             $sortingFieldName = $json['fields'][$sortingFieldIndex]['name'];
-            $entries = DB::queryArray("SELECT * FROM " . $this->tableName . " ORDER BY $sortingFieldName" . $this->selectSqlSuffix);
+            $entries = DB::queryArray("SELECT * FROM " . $this->tableName . $whereClause . " ORDER BY $sortingFieldName" . $this->selectSqlSuffix);
         } else {
             $pageSizeManual = array_key_exists("pageSize", $_GET);
             $pageSize = $pageSizeManual ? ((int)$_GET["pageSize"]) : $this->pageSize;
@@ -162,11 +186,11 @@ abstract class BackendTableRoute extends BackendRoute {
             $offset = $pageSize * ($page - 1);
             $limitSql = $pageSize == 0 ? "" : " LIMIT $pageSize OFFSET $offset";
             $orderBy = array_key_exists("orderBy", $json) ? " ORDER BY " . $json['orderBy'] : "";
-            $entries = DB::queryArray("SELECT * FROM " . $this->tableName . $orderBy . $this->selectSqlSuffix . $limitSql);
+            $entries = DB::queryArray("SELECT * FROM " . $this->tableName . $whereClause . $orderBy . $this->selectSqlSuffix . $limitSql);
 
             if ($pageSize != 0 && ($page > 1 || count($entries) == $pageSize)) {
                 $isPaginated = true;
-                $entryCount = DB::queryArray("SELECT COUNT(*) AS ct FROM " . $this->tableName . $this->selectSqlSuffix)[0]["ct"];
+                $entryCount = DB::queryArray("SELECT COUNT(*) AS ct FROM " . $this->tableName . $whereClause . $this->selectSqlSuffix)[0]["ct"];
                 $paginationInfo = [
                     "page" => $page,
                     "pageSize" => $pageSize,
@@ -191,7 +215,7 @@ abstract class BackendTableRoute extends BackendRoute {
 
         $entries = $this->renderBackendTableEntriesRecursive($entries, $modelClasses);
 
-        $this->renderTemplate("admin-general-form.html", array(
+        return array(
             "entries" => $entries,
             "ajaxtarget" => BACKEND_PREFIX . "/" . $this->slug . "/ajax",
             "slug" => $this->slug,
@@ -200,7 +224,7 @@ abstract class BackendTableRoute extends BackendRoute {
             "paginationInfo" => $paginationInfo,
             "sortable" => $canBeSorted,
             "adminurl" => BASEURL . BACKEND_PREFIX
-        ));
+        );
     }
 
 

@@ -277,4 +277,16 @@ class DB {
 		$timestamp = strtotime($date);
 		return strftime("%d. %B %Y um %H:%M", $timestamp);
 	}
+
+    /**
+     * @param array $components individual where clauses that are to be AND combined. The parts need to be escaped
+     * @return string empty string if components are empty, otherwise a part of an SQL clause starting with WHERE that
+     * contains all components.
+     */
+    public static function getWhereClauses(array $components): string {
+        if(!is_array($components) || count($components) === 0) {
+            return "";
+        }
+        return " WHERE ".implode(" AND ", $components);
+    }
 }
