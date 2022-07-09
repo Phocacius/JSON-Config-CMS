@@ -21,12 +21,12 @@ class DB {
 	 * @param  string 	$dbPassword db password
 	 * @param  string 	$dbName     db name
 	 */
-	public static function init($dbHost, $dbUser, $dbPassword, $dbName) {
+	public static function init($dbHost, $dbUser, $dbPassword, $dbName, $use4ByteUtf8 = false) {
 		self::$db = new mysqli($dbHost, $dbUser, $dbPassword, $dbName);
 		if (self::$db->connect_errno) {
 			$_SESSION['errors'][] = "MySQL connection failed: ". self::$db->connect_error;
 		}
-		self::$db->query("SET NAMES utf8;");
+		self::$db->query($use4ByteUtf8 ? "SET NAMES utf8mb4;" : "SET NAMES utf8;");
 	}
 
 	/**
