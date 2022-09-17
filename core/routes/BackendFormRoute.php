@@ -25,7 +25,7 @@ abstract class BackendFormRoute extends BackendRoute {
 
     /** MATCHING */
 
-    public function matches($route): bool {
+    public function matches(string $route): bool {
         $this->route = $route;
         return in_array($route, [
             BACKEND_PREFIX . "/" . $this->slug,
@@ -50,7 +50,7 @@ abstract class BackendFormRoute extends BackendRoute {
 
     /** FORM */
 
-    function renderBackend($route) {
+    function renderBackend(string $route) {
         if ($_SERVER['REQUEST_METHOD'] == "POST" && array_key_exists("form", $_POST) && $_POST['form'] == $this->jsonFileName) {
             $this->saveData();
         } else {

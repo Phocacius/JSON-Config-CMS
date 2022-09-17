@@ -38,7 +38,6 @@ class ParentId extends DataType {
 
     private function printHierarchy(array $entries, $level = 0) {
         $output = "";
-        if (!is_array($entries)) return $output;
         foreach ($entries as $entry) {
             if ($entry['id'] == $this->parentRoute->id) continue;
             $output .= "<option value=\"" . $entry['id'] . "\"";

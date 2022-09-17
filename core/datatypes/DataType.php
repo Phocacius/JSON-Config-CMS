@@ -45,7 +45,7 @@ abstract class DataType {
      * @param string $value the value as extracted from the $_POST or $_FILE data
      * @return mixed the value that will be saved into the database
      */
-    public function processValue(string $value) {
+    public function processValue($value) {
         return $value;
     }
 

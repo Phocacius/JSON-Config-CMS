@@ -54,13 +54,12 @@ class WYSIWYG extends DataType {
             }
             $setup .= "}";
         }
-        $output = "<textarea class=\"form-control\" rows=\"$rows\" id=\"input-$this->name\" name=\"$this->name\" $required>$this->value</textarea>\n
+        return "<textarea class=\"form-control\" rows=\"$rows\" id=\"input-$this->name\" name=\"$this->name\" $required>$this->value</textarea>\n
             <script type='text/javascript'>tinymce.init({
             	selector: '#input-$this->name',
             	language: 'de',
             	toolbar: '".$toolbar."',
             	plugins : 'advlist autolink link image lists charmap print preview contextmenu hr code insertdatetime textcolor'" . $setup . "
             });</script>\n";
-        return $output;
     }
 }

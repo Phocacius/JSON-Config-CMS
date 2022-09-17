@@ -36,7 +36,7 @@ class DB {
 	 */
 	public static function query($sql, $debug = false) {
 		$result = self::$db->query($sql);
-		if ($debug == true) {
+		if ($debug) {
 			$_SESSION['debug'][] = __FUNCTION__ . ': $sql is <strong>'.$sql.'</strong>';
 		}
 		if (self::$db->errno) {
@@ -51,7 +51,7 @@ class DB {
 	 */
 	public static function queryArray($sql, $debug = false) {
 		$result = self::$db->query($sql);
-		if ($debug == true) {
+		if ($debug) {
 			$_SESSION['debug'][] = __FUNCTION__ . ': $sql is <strong>'.$sql.'</strong>';
 		}
 		$ret = array();
@@ -84,7 +84,7 @@ class DB {
 
 		$sql = "INSERT INTO $table (".$keys.") VALUES (".$values.")";
 
-		if ($debug == true) {
+		if ($debug) {
 			$_SESSION['debug'][] = __FUNCTION__ . ': $sql is <strong>'.$sql.'</strong>';
 		}
 
@@ -118,7 +118,7 @@ class DB {
 
 		$sql .= " WHERE " . self::getPrimaryKeyColumn($table) . " = $id";
 
-		if ($debug == true) {
+		if ($debug) {
 			$_SESSION['debug'][] = __FUNCTION__ . ': $sql is <strong>'.$sql.'</strong>';
 		}
 
@@ -147,7 +147,7 @@ class DB {
 		if ($limit != null) {
 			$sql .= " LIMIT ".$limit;
 		}
-		if ($debug == true) {
+		if ($debug) {
 			$_SESSION['debug'][] = __FUNCTION__ . ': $sql is <strong>'.$sql.'</strong>';
 		}
 
@@ -172,7 +172,7 @@ class DB {
 	public static function delete($table, $id, $debug = false) {
 		$sql = "DELETE FROM $table WHERE " . self::getPrimaryKeyColumn($table) . " = $id";
 
-		if ($debug == true) {
+		if ($debug) {
 			$_SESSION['debug'][] = __FUNCTION__ . ': $sql is <strong>'.$sql.'</strong>';
 		}
 
@@ -208,7 +208,7 @@ class DB {
 	public static function getPrimaryKeyColumn($table, $debug = false) {
 		$sql = "SHOW KEYS FROM $table WHERE key_name = 'PRIMARY'";
 
-		if ($debug == true) {
+		if ($debug) {
 			$_SESSION['debug'][] = __FUNCTION__ . ': $sql is <strong>'.$sql.'</strong>';
 		}
 		
@@ -284,7 +284,7 @@ class DB {
      * contains all components.
      */
     public static function getWhereClauses(array $components): string {
-        if(!is_array($components) || count($components) === 0) {
+        if(count($components) === 0) {
             return "";
         }
         return " WHERE ".implode(" AND ", $components);

@@ -71,7 +71,7 @@ abstract class BackendSubTableRoute extends BackendTableRoute {
         return $parentData;
     }
 
-    protected function processDataBeforeSaving(array $values, ?array $previousData): array {
+    protected function processDataBeforeSaving(array $values, ?array $previousData = null): array {
         if (array_key_exists("id", $_GET)) {
             $id = (int)$_GET['id'];
             $values[$this->refColumnName] = $id;

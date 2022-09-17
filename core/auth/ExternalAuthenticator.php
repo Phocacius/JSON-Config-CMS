@@ -27,7 +27,7 @@ class ExternalAuthenticator extends DbTableAuthenticator {
     }
 
 
-    public function verifyPassword($userIdentifier, $password): bool {
+    public function verifyPassword(string $userIdentifier, string $password): bool {
         $authToken = $this->createAuthToken($userIdentifier, $password);
         if (!$authToken) return false;
 
@@ -35,7 +35,7 @@ class ExternalAuthenticator extends DbTableAuthenticator {
         return true;
     }
 
-    public function login($userIdentifier, $password): bool {
+    public function login(string $userIdentifier, string $password): bool {
         $authToken = $this->createAuthToken($userIdentifier, $password);
         if (!$authToken) return false;
 

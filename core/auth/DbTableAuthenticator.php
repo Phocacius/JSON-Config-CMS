@@ -61,7 +61,7 @@ class DbTableAuthenticator extends Authenticator {
         return true;
     }
 
-    public function verifyPassword($userIdentifier, $password): bool {
+    public function verifyPassword(string $userIdentifier, string $password): bool {
         $result = DB::queryArray($this->getVerifyPasswordSql($userIdentifier));
         if (!$result || count($result) == 0) {
             return false;
@@ -72,7 +72,7 @@ class DbTableAuthenticator extends Authenticator {
         return true;
     }
 
-    public function login($userIdentifier, $password): bool {
+    public function login(string $userIdentifier, string $password): bool {
         $result = DB::queryArray($this->getVerifyPasswordSql($userIdentifier));
         if (!$result || count($result) == 0) {
             return false;

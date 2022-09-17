@@ -61,7 +61,7 @@ abstract class BackendTableRoute extends BackendRoute {
      * @param array|null $previousData the previously saved version of this entry. May be null for newly created entries
      * @return array the processed data that will be saved to the databae
      */
-    protected function processDataBeforeSaving(array $values, ?array $previousData): array {
+    protected function processDataBeforeSaving(array $values, ?array $previousData = null): array {
         return $values;
     }
 
@@ -87,14 +87,14 @@ abstract class BackendTableRoute extends BackendRoute {
         return true;
     }
 
-    public function renderBackend($route) {
+    public function renderBackend(string $route) {
         if ($this->matchesForm($this->route)) $this->renderBackendForm();
         if ($this->matchesEdit($this->route)) $this->renderBackendEdit();
     }
 
     /** MATCHING */
 
-    public function matches($route): bool {
+    public function matches(string $route): bool {
         $this->route = $route;
         return $this->matchesForm($route) || $this->matchesEdit($route) || $this->matchesAjax($route) || $this->matchesView($route);
     }
@@ -390,7 +390,7 @@ abstract class BackendTableRoute extends BackendRoute {
                 }
             }
             foreach ($modelClasses as $modelClass) {
-                if ($modelClass instanceof SpecialDataType && $modelClass instanceof DataType) {
+                if ($modelClass instanceof SpecialDataType) {
                     $entries[$i][$modelClass->name] = $modelClass->renderBackendTableSpecial($entries[$i]);
                 }
             }

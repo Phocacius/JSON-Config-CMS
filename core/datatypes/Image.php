@@ -3,8 +3,9 @@
 /**
  * Allows to upload an image and automatically scales it to customisable sizes
  *
- * Images will be saved on disk at `[DOCUMENT_ROOT]/img/[size]/[filename].[extension]`
- * `DOCUMENT_ROOT` is a constant that should be defined in your `config.php`.
+ * Images will be saved on disk at `[IMG_ROOT]/[size]/[filename].[extension]` or `[DOCUMENT_ROOT]/img/[size]/[filename].[extension]`
+ * `DOCUMENT_ROOT` and `DOCUMENT_ROOT` are constants defined in your `config.php`.
+ * `IMG_ROOT` has a higher priority but is optional, `DOCUMENT_ROOT` will be used as fallback.
  * `size` is the scaleString that was used to scale this image (see below)
  * `filename` is the original upload filename followed by an underscore and the upload timestamp (to avoid duplicates)
  * The database column should be varchar and contains just filename and extension
@@ -86,16 +87,17 @@ class Image extends DataType {
 
         $filename = pathinfo($value['name'])['filename'] . "_" . time() . "." . $ext;
 
+        $root = defined("IMG_ROOT") ? IMG_ROOT : (DOCUMENT_ROOT . "img/");
         if (!is_array($this->config['sizes']) || count($this->config['sizes']) == 0) {
-            move_uploaded_file($value['tmp_name'], DOCUMENT_ROOT . "img/" . $filename);
+            move_uploaded_file($value['tmp_name'], $root . $filename);
             return $filename;
         }
 
         $scaler = new ImageScaler($value['tmp_name']);
         foreach ($this->config['sizes'] as $size) {
-            $oldFile = DOCUMENT_ROOT . "img/" . $size . "/" . $this->value;
+            $oldFile = $root . $size . "/" . $this->value;
             if (is_file($oldFile)) unlink($oldFile);
-            $scaler->scale($size, DOCUMENT_ROOT . "img/" . $size . "/$filename");
+            $scaler->scale($size, $root . $size . "/$filename");
         }
 
         return $filename;
