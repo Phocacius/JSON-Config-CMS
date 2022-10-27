@@ -123,6 +123,21 @@ abstract class Route {
     }
 
     /**
+     * searches through a list of fields for a field with the given name
+     * @param array $fields as returned by @see loadData()["fields"]
+     * @param string $name the name to look for
+     * @return array|null
+     */
+    public function findFieldByName(array $fields, string $name): ?array {
+        foreach ($fields as $field) {
+            if(is_array($field) && $field["name"] === $name) {
+                return $field;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Renders a twig template (https://twig.symfony.com/) with the given arguments
      * @param string $template name of the template file (including extension) within the `templates` folder
      * @param array $values arguments for the twig template. baseurl will be automatically added
