@@ -14,6 +14,6 @@
 class Hidden extends DataType {
 
     function renderBackendForm(): string {
-        return "<input type=\"hidden\" id=\"input-$this->name\" name=\"$this->name\" value=\"".htmlentities($this->value)."\">\n";
+        return "<input type=\"hidden\" id=\"input-$this->name\" name=\"$this->name\" value=\"".($this->value ? htmlentities($this->value) : "")."\">\n";
     }
 }

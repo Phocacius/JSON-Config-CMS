@@ -30,7 +30,7 @@ class DataTypeFactory {
             case "image": return new Image($config);
             case "wysiwyg": return new WYSIWYG($config);
             case "code": return new CodeEditor($config);
-            case "readonly": return new ReadOnly($config);
+            case "readonly": return new ReadOnlyField($config);
             case "location": return new GeoLocation($config);
             case "checkbox": return new CheckBox($config);
             case "bitmap": return new BitMap($config);

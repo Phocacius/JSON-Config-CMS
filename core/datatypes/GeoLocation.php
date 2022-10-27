@@ -20,8 +20,7 @@ class GeoLocation extends DataType {
     }
 
     function renderBackendTable($value): string {
-
-        $val = $value ? json_decode($this->value, true) : null;
+        $val = $value ? json_decode($value, true) : null;
         if($val === null) return "-";
 
         $lat = $val['lat'];

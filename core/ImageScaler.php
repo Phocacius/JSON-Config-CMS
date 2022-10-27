@@ -90,12 +90,12 @@ class ImageScaler {
                     $yRatio = ($srcHeight / (double)$targetHeight);
                     if ($xRatio > $yRatio) {
                         $paddingX = ($srcWidth - ($yRatio * $targetWidth)) / 2;
-                        $srcCoords[0] = $paddingX;
-                        $srcCoords[2] = $srcWidth - $paddingX;
+                        $srcCoords[0] = (int) $paddingX;
+                        $srcCoords[2] = (int) ($srcWidth - $paddingX);
                     } elseif ($yRatio > $xRatio) {
                         $paddingY = ($srcHeight - ($xRatio * $targetHeight)) / 2;
-                        $srcCoords[1] = $paddingY;
-                        $srcCoords[3] = $srcHeight - $paddingY;
+                        $srcCoords[1] = (int) $paddingY;
+                        $srcCoords[3] = (int) ($srcHeight - $paddingY);
                     }
                 } elseif ($targetWidth > 0) {
                     $targetHeight = (int)($targetWidth / ($srcWidth / (double)$srcHeight));

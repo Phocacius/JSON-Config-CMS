@@ -22,7 +22,7 @@ class Input extends DataType {
     function renderBackendForm(): string {
         $type = $this->config['type'] ?: "text";
         $required = $this->required ? "required" : "";
-        $value = $type === 'password' ? '' : htmlentities($this->value);
+        $value = $type === 'password' ? '' : ($this->value ? htmlentities($this->value) : "");
         if (!$value && array_key_exists("default", $this->config)) {
             $value = $this->config['default'];
         }
