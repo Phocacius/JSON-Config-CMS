@@ -118,6 +118,10 @@ class Image extends DataType {
         FileUtils::passThroughFile($filename, $value);
     }
 
+    /**
+     * displays an overview page showing each size identifier and its corresponding picture
+     * @return void
+     */
     private function showOverviewPage() {
         foreach ($this->config["sizes"] as $size) {
             echo "<p>" . $size . "</p>";
@@ -125,6 +129,15 @@ class Image extends DataType {
         }
     }
 
+    /**
+     * calculates the path for viewing the picture
+     * when called from a FrontendRoute, this will link to the image file on the server's file system. Note that
+     *   this only works, when the image storage location is accessible from the web server
+     * when called from a BackendRoute, the file will be offered and cached by php, which allows the files to be anywhere
+     *   in the file system. The link can be extended with ?mode=overview which will show a HTML page with all available
+     *   resolution and ?s=resolutionString to show a specific resolution
+     * @return string path
+     */
     private function routeToView(): string {
         if ($this->parentRoute instanceof BackendRoute) {
             $route = BASEURL . BACKEND_PREFIX . "/" . $this->parentRoute->slug;
@@ -138,6 +151,10 @@ class Image extends DataType {
 
     }
 
+    /**
+     * gets the directory, where images are stored
+     * @return string path
+     */
     private function getRootDir(): string {
         return defined("IMG_ROOT") ? IMG_ROOT : (DOCUMENT_ROOT . "img/");
     }
