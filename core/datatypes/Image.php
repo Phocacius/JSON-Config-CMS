@@ -32,8 +32,10 @@ class Image extends DataType {
 
     function renderBackendForm(): string {
         $output = $this->renderBackendTable($this->value);
+        if ($this->value && ($this->parentRoute instanceof BackendRoute)) {
+            $output .= "<div><a href='" . $this->routeToView() . "?mode=overview' target='_blank'>Alle Größen anzeigen</a></div>";
+        }
         if ($this->value) {
-            $output .= "<div><a href='".$this->routeToView()."?mode=overview' target='_blank'>Alle Größen anzeigen</a></div>";
             $output .= "<div><a class='image__delete' href='#' data-field='" . $this->name . "'>Bild löschen</a></div>";
         }
 
@@ -46,11 +48,7 @@ class Image extends DataType {
         if (!$value) {
             $output .= "<div style='font-size: 10pt;'>Noch kein Bild ausgewählt</div>\n";
         } else {
-            $dataDir = BASEURL . "/data/img/";
-            if (is_array($this->config['sizes']) && count($this->config['sizes']) > 0) {
-                $dataDir .= $this->config['sizes'][0] . "/";
-            }
-            $output .= "<div><img style='max-width: 150px; max-height: 150px;' src='". $this->routeToView() ."'></div>\n";
+            $output .= "<div><img style='max-width: 150px; max-height: 150px;' src='" . $this->routeToView() . "'></div>\n";
         }
 
         return $output;
@@ -90,7 +88,7 @@ class Image extends DataType {
 
         $filename = pathinfo($value['name'])['filename'] . "_" . time() . "." . $ext;
 
-        $root = defined("IMG_ROOT") ? IMG_ROOT : (DOCUMENT_ROOT . "img/");
+        $root = $this->getRootDir();
         if (!is_array($this->config['sizes']) || count($this->config['sizes']) == 0) {
             move_uploaded_file($value['tmp_name'], $root . $filename);
             return $filename;
@@ -108,12 +106,12 @@ class Image extends DataType {
 
     function viewRaw($value) {
         $mode = array_key_exists("mode", $_GET) ? $_GET["mode"] : "single";
-        if($mode === "overview") {
+        if ($mode === "overview") {
             $this->showOverviewPage();
             return;
         }
 
-        $root = defined("IMG_ROOT") ? IMG_ROOT : (DOCUMENT_ROOT . "img/");
+        $root = $this->getRootDir();
         $size = array_key_exists("s", $_GET) ? str_replace("/", "", $_GET["s"]) : $this->config["sizes"][0];
         $filename = $root . $size . "/" . $value;
 
@@ -122,16 +120,25 @@ class Image extends DataType {
 
     private function showOverviewPage() {
         foreach ($this->config["sizes"] as $size) {
-            echo "<p>".$size."</p>";
-            echo "<img src='?s=".$size."'>";
+            echo "<p>" . $size . "</p>";
+            echo "<img src='?s=" . $size . "'>";
         }
     }
 
     private function routeToView(): string {
-        $route = BASEURL . BACKEND_PREFIX . "/" . $this->parentRoute->slug;
-        if($this->parentRoute instanceof BackendTableRoute) {
-            $route .= "/" . $this->parentRoute->id;
+        if ($this->parentRoute instanceof BackendRoute) {
+            $route = BASEURL . BACKEND_PREFIX . "/" . $this->parentRoute->slug;
+            if ($this->parentRoute instanceof BackendTableRoute) {
+                $route .= "/" . $this->parentRoute->id;
+            }
+            return $route . "/view/" . $this->name;
+        } else {
+            return BASEURL . str_replace(getcwd(), "", $this->getRootDir()) . $this->config["sizes"][0] . "/" . $this->value;
         }
-        return $route . "/view/" . $this->name;
+
+    }
+
+    private function getRootDir(): string {
+        return defined("IMG_ROOT") ? IMG_ROOT : (DOCUMENT_ROOT . "img/");
     }
 }
