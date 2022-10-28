@@ -15,9 +15,13 @@ abstract class BackendFormRoute extends BackendRoute {
         $this->jsonTableName = "forms";
     }
 
-    public $slug;
+    public string $jsonFileName;
 
-    public $jsonFileName;
+    /**
+     * The field name that should be viewed. Will only be set when viewing an entry
+     * @var int|null
+     */
+    protected $fieldToBeViewed;
 
     protected function processDataBeforeSaving(array $values): array {
         return $values;
@@ -30,7 +34,7 @@ abstract class BackendFormRoute extends BackendRoute {
         return in_array($route, [
             BACKEND_PREFIX . "/" . $this->slug,
             BACKEND_PREFIX . "/" . $this->slug . "/"
-        ]) || $this->matchesAjax($route);
+        ]) || $this->matchesAjax($route) || $this->matchesView($route);
     }
 
     function matchesAjax($route): bool {
@@ -40,9 +44,22 @@ abstract class BackendFormRoute extends BackendRoute {
         ]);
     }
 
+    private function matchesView($route): bool {
+        $doesMatch = preg_match("|" . BACKEND_PREFIX . "/" .$this->slug . "/view/([^/]+)|", $route, $matches);
+        if ($doesMatch) {
+            $this->fieldToBeViewed = $matches[1];
+            return true;
+        }
+        return false;
+    }
+
     protected function shouldRenderTemplate(): bool {
         if ($this->matchesAjax($this->route)) {
             BackendTableAjaxHelper::handleAjaxForm($this);
+            return false;
+        }
+        if ($this->matchesView($this->route)) {
+            $this->renderView();
             return false;
         }
         return parent::shouldRenderTemplate();
@@ -55,6 +72,23 @@ abstract class BackendFormRoute extends BackendRoute {
             $this->saveData();
         } else {
             $this->renderForm();
+        }
+    }
+
+    /**
+     * renders the view mode of a single field of a single entry by calling [viewRaw] on the field's [DataType]
+     * useful e.g. for data types like file or image to show the file contents
+     * @link DataType::viewRaw()
+     */
+    protected function renderView() {
+        $json = $this->loadData($this->jsonFileName);
+        foreach ($json['fields'] as $field) {
+            if ($field['name'] == $this->fieldToBeViewed) {
+                $datatype = $this->getDataType($field);
+                $value = Storage::getInstance()->get($field["name"]);
+                $datatype->viewRaw($value);
+                return;
+            }
         }
     }
 

@@ -32,7 +32,10 @@ class Image extends DataType {
 
     function renderBackendForm(): string {
         $output = $this->renderBackendTable($this->value);
-        if ($this->value) $output .= "<div><a class='image__delete' href='#' data-field='" . $this->name . "'>Bild löschen</a></div>";
+        if ($this->value) {
+            $output .= "<div><a href='".$this->routeToView()."?mode=overview' target='_blank'>Alle Größen anzeigen</a></div>";
+            $output .= "<div><a class='image__delete' href='#' data-field='" . $this->name . "'>Bild löschen</a></div>";
+        }
 
         $required = $this->required ? "required" : "";
         return $output . "<input class=\"form-control\" type=\"file\" id=\"input-$this->name\" name=\"$this->name\" value=\"$this->value\" $required>\n";
@@ -47,7 +50,7 @@ class Image extends DataType {
             if (is_array($this->config['sizes']) && count($this->config['sizes']) > 0) {
                 $dataDir .= $this->config['sizes'][0] . "/";
             }
-            $output .= "<div><img style='max-width: 150px; max-height: 150px;' src='" . $dataDir . $value . "'></div>\n";
+            $output .= "<div><img style='max-width: 150px; max-height: 150px;' src='". $this->routeToView() ."'></div>\n";
         }
 
         return $output;
@@ -101,5 +104,34 @@ class Image extends DataType {
         }
 
         return $filename;
+    }
+
+    function viewRaw($value) {
+        $mode = array_key_exists("mode", $_GET) ? $_GET["mode"] : "single";
+        if($mode === "overview") {
+            $this->showOverviewPage();
+            return;
+        }
+
+        $root = defined("IMG_ROOT") ? IMG_ROOT : (DOCUMENT_ROOT . "img/");
+        $size = array_key_exists("s", $_GET) ? str_replace("/", "", $_GET["s"]) : $this->config["sizes"][0];
+        $filename = $root . $size . "/" . $value;
+
+        FileUtils::passThroughFile($filename, $value);
+    }
+
+    private function showOverviewPage() {
+        foreach ($this->config["sizes"] as $size) {
+            echo "<p>".$size."</p>";
+            echo "<img src='?s=".$size."'>";
+        }
+    }
+
+    private function routeToView(): string {
+        $route = BASEURL . BACKEND_PREFIX . "/" . $this->parentRoute->slug;
+        if($this->parentRoute instanceof BackendTableRoute) {
+            $route .= "/" . $this->parentRoute->id;
+        }
+        return $route . "/view/" . $this->name;
     }
 }

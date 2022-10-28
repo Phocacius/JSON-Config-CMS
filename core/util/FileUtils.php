@@ -53,4 +53,46 @@ class FileUtils {
 
         return false;
     }
+
+    /**
+     * Offer a file from the file system for the user to view (only for images, pdfs etc) or download
+     * The program will respond with the status code 200, 304 Not Modified or 404 Not Found
+     * @note the program will exit in any case after calling this function
+     * @param string $path path to the file that should be passed through to the user
+     * @param string|null $filename the filename that will be exposed to the user. Defaults to the file's name on filesystem if omitted
+     * @param bool $forceDownload even viewable files like images will be downloaded to the user's computer instead of viewed in the browser
+     * @return void
+     */
+    static function passThroughFile(string $path, ?string $filename = null, bool $forceDownload = false) {
+        if (!file_exists($path)) {
+            http_response_code(404);
+            exit;
+        }
+
+        $dateFormat = 'D, d M Y H:i:s e';
+        $serverLastModifiedTime = filemtime($path);
+        $serverLastModifiedString = gmdate($dateFormat, $serverLastModifiedTime) . ' GMT';
+
+        if (!$forceDownload && array_key_exists("HTTP_IF_MODIFIED_SINCE", $_SERVER)) {
+
+            $clientLastModifiedString = $_SERVER["HTTP_IF_MODIFIED_SINCE"];
+            $clientLastModifiedTime = date_parse_from_format($clientLastModifiedString, $dateFormat);
+            if($clientLastModifiedTime >= $serverLastModifiedTime) {
+                http_response_code(304);
+                header('Last-Modified: ' . $serverLastModifiedString);
+                header('Cache-Control: no-cache');
+                exit;
+            }
+        }
+
+        $fp = fopen($path, 'rb');
+        header("Content-Type: " . mime_content_type($path));
+        header("Content-Length: " . filesize($path));
+        header("Content-Disposition: ".($forceDownload ? "attachment" : "inline")."; filename=" . ($filename ?? basename($path)));
+        header('Last-Modified: ' . $serverLastModifiedString);
+        header('Cache-Control: no-cache');
+
+        fpassthru($fp);
+        exit;
+    }
 }

@@ -15,12 +15,6 @@ abstract class BackendTableRoute extends BackendRoute {
     /** VARIABLES AND API  */
 
     /**
-     * The url part this route is accessible from (e.g. https://your.page/users -> users will be the slug)
-     * @var string
-     */
-    public $slug;
-
-    /**
      * The table name within your mysql database this route should operate on
      * @var string
      */

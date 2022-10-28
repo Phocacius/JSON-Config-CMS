@@ -97,14 +97,6 @@ class File extends DataType {
 
     function viewRaw($value) {
         $filename = $this->storageDir . $value;
-
-        $fp = fopen($filename, 'rb');
-
-        header("Content-Type: " . mime_content_type($filename));
-        header("Content-Length: " . filesize($filename));
-        header("Content-Disposition: inline; filename=" . $value);
-
-        fpassthru($fp);
-        exit;
+        FileUtils::passThroughFile($filename, $value);
     }
 }

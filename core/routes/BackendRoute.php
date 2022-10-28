@@ -14,6 +14,12 @@ abstract class BackendRoute extends Route {
      */
     protected $route;
 
+    /**
+     * The url part this route is accessible from (e.g. https://your.page/users -> users will be the slug)
+     * @var string
+     */
+    public $slug;
+
     public function __construct() {
         parent::__construct();
     }
@@ -53,7 +59,6 @@ abstract class BackendRoute extends Route {
             Router::getInstance()->redirect("/login");
         }
     }
-
 
     /**
      * Generates and returns a html rendering an edit form using the fields of the given json configuration file
