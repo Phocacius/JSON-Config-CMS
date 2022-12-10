@@ -197,6 +197,7 @@ class DB {
 	 * @return string         	escaped string
 	 */
 	public static function escape($string) {
+        if($string === null) return null;
 		return self::$db->real_escape_string($string);
 	}
 
