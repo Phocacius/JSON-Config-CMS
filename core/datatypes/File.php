@@ -53,7 +53,7 @@ class File extends DataType {
         if (!file_exists($filepath)) {
             $output .= " (fehlend)";
         } elseif($this->parentRoute instanceof BackendTableRoute) {
-            $output .= " (" . FileUtils::formattedFileSize($filepath) . ") <a href=\"" . BASEURL . "/" . $this->parentRoute->slug . "/" . $this->parentRoute->id . "/view/" . $this->name . "\" target=\"_blank\">💾</a>";
+            $output .= " (" . FileUtils::formattedFileSize($filepath) . ") <a href=\"" . BASEURL . (defined('BACKEND_PREFIX') ? BACKEND_PREFIX : '') . "/" . $this->parentRoute->slug . "/" . $this->parentRoute->id . "/view/" . $this->name . "\" target=\"_blank\">💾</a>";
         }
         return "</div>" . $output;
     }
