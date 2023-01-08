@@ -40,7 +40,7 @@ class WYSIWYG extends DataType {
         $required = $this->required ? "required" : "";
         $setup = "";
         $toolbar = array_key_exists('toolbar', $this->config) ? $this->config["toolbar"] :
-            "undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | outdent indent";
+            "undo redo | styleselect | fontsizeselect | bold italic | alignleft aligncenter alignright alignjustify | outdent indent";
 
         if (array_key_exists("buttons", $this->config)) {
             $setup = ', setup: function(editor) {';
@@ -59,6 +59,8 @@ class WYSIWYG extends DataType {
             	selector: '#input-$this->name',
             	language: 'de',
             	toolbar: '".$toolbar."',
+            	fontsize_formats: '0.5rem 0.7rem 0.8rem 0.9rem 1rem 1.1rem 1.2rem 1.3rem 1.5rem 2rem',
+            	content_style: 'body { font-size: 1rem; }',
             	plugins : 'advlist autolink link image lists charmap print preview contextmenu hr code insertdatetime textcolor'" . $setup . "
             });</script>\n";
     }
