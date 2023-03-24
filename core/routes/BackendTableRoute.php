@@ -114,7 +114,7 @@ abstract class BackendTableRoute extends BackendRoute {
     }
 
     private function matchesView($route): bool {
-        $doesMatch = preg_match("|" . BACKEND_PREFIX . "/" .$this->slug . "/([^/]+)/view/([^/]+)|", $route, $matches);
+        $doesMatch = preg_match("|" . BACKEND_PREFIX . "/" . $this->slug . "/([^/]+)/view/([^/]+)|", $route, $matches);
         if ($doesMatch) {
             $this->id = $matches[1];
             $this->fieldToBeViewed = $matches[2];
@@ -190,8 +190,8 @@ abstract class BackendTableRoute extends BackendRoute {
                     "pageSize" => $pageSize,
                     "pageSizeManual" => $pageSizeManual,
                     "entryCount" => $entryCount,
-                    "entryDisplayedFrom" => ($page-1) * $pageSize + 1,
-                    "entryDisplayedTo" => ($page-1) * $pageSize + count($entries),
+                    "entryDisplayedFrom" => ($page - 1) * $pageSize + 1,
+                    "entryDisplayedTo" => ($page - 1) * $pageSize + count($entries),
                     "pageCount" => ceil($entryCount / $pageSize)
                 ];
             }
@@ -395,10 +395,13 @@ abstract class BackendTableRoute extends BackendRoute {
     /**
      * Processes an uploaded zip file. It creates a temporary directory and unzips the contents in there
      * Then, [processFolder] is called
+     * @param string|null $filename path to the zip file to be unzipped. If null, will be read from $_FILES['zip_file']
      * @link processFolder
      */
-    private function handleZipUpload() {
-        $filename = $_FILES['zipfile']['name'];
+    protected function handleZipUpload(?string $path = null) {
+        $filename = $path === null ? $_FILES['zipfile']['name'] : basename($path);
+        $sourceFile = $path === null ? $_FILES['zipfile']['tmp_name'] : $path;
+
         $info = pathinfo($filename);
 
         if ($info['extension'] !== 'zip') {
@@ -409,10 +412,9 @@ abstract class BackendTableRoute extends BackendRoute {
         $tmpDir = defined("TMP_DIR") ? TMP_DIR : DOCUMENT_ROOT . "tmp/" . uniqid();
         mkdir($tmpDir, 0777, true);
 
-        $tmpFile = $_FILES['zipfile']['tmp_name'];
         $zip = new ZipArchive;
-        if ($zip->open($tmpFile) !== TRUE) {
-            unlink($tmpFile);
+        if ($zip->open($sourceFile) !== TRUE) {
+            unlink($sourceFile);
             rmdir($tmpDir);
             array_push($_SESSION['errors'], "Die hochgeladene Datei kann nicht als ZIP-Archiv geöffnet werden.");
             return;

@@ -58,7 +58,7 @@ class File extends DataType {
         return "</div>" . $output;
     }
 
-    public function processValue($value) {
+    public function processValue($value, bool $checkForUploadedFile = true) {
         if (is_array($value) && array_key_exists("tmp_name", $value) && !$value['tmp_name']) return $this->value;
         if (!$value) return $this->value;
 
@@ -89,8 +89,11 @@ class File extends DataType {
             $filename = $pathinfo['filename'] . "_" . time() . "." . $pathinfo['extension'];
         }
 
-
-        move_uploaded_file($value['tmp_name'], $this->storageDir . $filename);
+        if($checkForUploadedFile) {
+            move_uploaded_file($value['tmp_name'], $this->storageDir . $filename);
+        } else {
+            rename($value['tmp_name'], $this->storageDir . $filename);
+        }
 
         return $filename;
     }
