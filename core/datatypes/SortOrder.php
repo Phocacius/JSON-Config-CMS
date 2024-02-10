@@ -13,7 +13,7 @@ class SortOrder extends DataType {
 
     function renderBackendForm(): string {
         return "<p>Aktuelle Position: " . $this->value . "<br>Die Sortierung kann über Drag&Drop auf der Übersichtsseite geändert werden.</p>\n
-                <input type=\"hidden\" id=\"input-$this->name\" name=\"$this->name\" value=\"" . htmlentities($this->value) . "\">\n";
+                <input type=\"hidden\" id=\"input-$this->name\" name=\"$this->name\" value=\"" . ($this->value ? htmlentities($this->value) : '') . "\">\n";
     }
 
     public function renderBackendTable($value): string {

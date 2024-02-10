@@ -47,6 +47,10 @@ abstract class FrontendRoute extends Route {
         return $defaults;
     }
 
+    protected function getGlobalVariables(): array {
+        return [];
+    }
+
 
     /**
      * renders the frontend base html (if [shouldRenderTemplate] returns true) and calls [renderFrontend]
@@ -56,12 +60,13 @@ abstract class FrontendRoute extends Route {
      * @see shouldRenderTemplate
      */
     function render($route) {
-        $globals = Storage::getInstance()->getAll();
+        $globals = $this->getGlobalVariables();
         $showHeaderFooter = $this->shouldRenderTemplate();
 
         if ($showHeaderFooter) {
             $this->renderTemplate("frontend-header.html", $this->provideHeaderVariables(array(
-                "globals" => $globals
+                "globals" => $globals,
+                "url" => (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]",
             )), $this->showErrorsInHeader);
         }
 

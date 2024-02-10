@@ -29,10 +29,10 @@ class WYSIWYG extends DataType {
             }
             if (array_key_exists("maxCharacters", $config)) {
                 $splittedValue = explode("\n", wordwrap($value, $config['maxCharacters']))[0];
-                $value = strlen($splittedValue) != strlen($value) ? $splittedValue . " …" : $value;
+                $value = strlen($splittedValue) != strlen($value) ? ($splittedValue . " …") : $value;
             }
         }
-        return $value || "";
+        return $value ?? "";
     }
 
     function renderBackendForm(): string {
